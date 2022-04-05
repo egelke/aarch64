@@ -15,8 +15,8 @@ Projects so far:
 
 0. **Sum**: Setup of the environment, including debugging and leaf functions
 1. **HelloWorld**: constants, initialized global data, temp registers and unchained functions
-2. **MeaningOfLife**: register aliases, uninitialized global data, saved registers and chained functions
-3. **ArgEcho**: local allocated data and loops
+2. **MeaningOfLife**: register aliases, uninitialized global data, saved registers and chained functions (WIP)
+3. **ArgEcho**: local allocated data and loops (WIP)
 4. ...
 
 All the project are tested on a Surface Pro X.

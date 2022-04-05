@@ -3,8 +3,8 @@
     .text
     .p2align 2
 
-    //entry point (see linker)
-    .global sum
+	//entry point (see linker)
+	.global sum
 sum:
     //sum 2 constants
     mov x10, #1
