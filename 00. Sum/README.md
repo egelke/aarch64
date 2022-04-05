@@ -54,7 +54,11 @@ For easy deployment I also suggest you activate network sharing and you expose a
 
 ### Source file
 
-At this time the source code exists of a single `.asm` file.  It has some headers, a single code block and exposes a single procedure: `sum`.
+At this time the source code exists of a single `.asm` file.  It has some headers, a single code block and exposes a single procedure: `sum`.  It is done this way because in Windows a program is a function called by the kernel, whic the linker prepared when creating the executable.  By default that is `mainCRTStartup`, but you can specify your own via the `/ENTRY` parameter with `link.exe`.  I opted to change the name to "sum", since I didn't like that the defualt has CRT which stands for C-RunTime, while there is not C involved here.
+
+The program ends when the entry function return, the program exit code is the function return code.
+
+As for the actual logic, it simply loads 2 constants in 2 temporaly registers and adds them to a 3rd temporary register.  You will need the debugger to actually verify it.
 
 ### Build files
 
@@ -77,8 +81,6 @@ The makefile must be invoked with the `nmake` command with the VC build tools ac
 * __clean__: removes the builds by deleting all fines from the `bin` and `obj` folder
 
 
-## Deploying
-
-
 ## Debugging
 
+TODO
