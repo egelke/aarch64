@@ -15,11 +15,6 @@ rethinking and refactoring, but I came to a point I'm happy with the result.  He
 
 As you can see, lots of hurdles to take, but in the end I'm rather pleased with the result.  You may prefer a different setup, this is the one that works for me and this is the one I'll be using for the moment.  Feel free to experiment and let me know why yours is superior.
 
-## Prerequisites
-
-* __Dev PC__: Windows x64 with sufficient power
-* __Target PC__: Windows aarch65/arm64 PC like the Microsoft Surface Pro X
-
 ## Installation and Setup
 
 ### Dev PC
