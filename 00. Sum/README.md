@@ -78,7 +78,7 @@ The makefile must be invoked with the `nmake` command with the VC build tools ac
 
 ## Debugging
 
-On your target machine, `Process Server`:
+On your target machine, start the `Process Server` with the following command:
 
 ```
 c:\Users\bryan> dbgsrv -t tcp:port=5005
@@ -107,7 +107,7 @@ ntdll!LdrpDoDebuggerBreak+0x30:
 
 In summary it is telling you the kernel loaded your program (`sum.exe`) and hit a breakpoint right before it started executing your application.
 
-First we will tell it to stop at the entry point of your program, which is the `start` (the underscore got dropped by the toolchain) in the `sum` module.  Yo do this by typing the following command in at the bottom of the command window:
+First we will tell it to stop at the entry point of your program, which is the `start` (the underscore got dropped by the toolchain) in the `sum` module.  You do this by typing the following command in at the bottom of the command window:
 
 ```
 0:000> bm sum!start
