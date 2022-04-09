@@ -3,8 +3,9 @@
     .text               //start of the code block
     .p2align 2          //align the code on 2^2 (i.e. 4) bytes
 
-	.global sum         //expose the sum-method
-sum:                    //the start of the sum-method
+    .global _start      //expose the sum-method
+_start:                 //the start of the sum-method
+
 
     //sum 2 constants
     mov x10, #19

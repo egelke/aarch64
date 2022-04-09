@@ -8,7 +8,7 @@ ASM_FLAGS =
 
 LINK_LIB = 
 LINK_DEBUG = /DEBUG
-LINK_ENTRY = "sum"
+LINK_ENTRY = "_start"
 
 OBJ_DIR = obj\ 
 BIN_DIR = bin\ 
