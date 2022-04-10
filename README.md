@@ -12,8 +12,8 @@ I'm planning to make a YouTube series on this, but until then you will have to d
 
 Projects so far:
 
-0. **Sum**: Setup of the environment, including debugging and a leaf functions
-1. **HelloWorld**: constants, initialized global data, temp registers and unchained functions
+0. **[Sum](00.%20Sum/)**: Setup of the environment, including debugging and a leaf functions
+1. **[HelloWorld](01.%20HelloWorld/)**: constants, initialized global data, temp registers and unchained functions
 2. **MeaningOfLife**: register aliases, uninitialized global data, saved registers and chained functions (WIP)
 3. **ArgEcho**: local allocated data and loops (WIP)
 4. ...
