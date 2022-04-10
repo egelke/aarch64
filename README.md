@@ -5,8 +5,9 @@ A set of projects to learn aarch64 (ARM64) assembly language for _Windows_.
 While there is some information out there of how to develop for ARM Assembly on Linux, there is virtually nothing available for ARM assembly for Windows.  Granted, it is far from popular and we should all be developing in higher
 languages like C, C++ or C# anyway; but its always nice to learn what is going on under the hood.
 
-So it took it upon me to create a series of project that explain aarch64 (aka arm64) assembly language for Windows.
-While I have over 20 year of experience in programming, I have never been a low-level developer.  This tutorial is really "on eye leading the blind", so if you spot any mistakes, please feel free to comment or reach out to me in any other way.
+So it took it upon me to create a series of project that explain aarch64 (aka ARM64 or 64bit ARM) assembly language for Windows.  While I have over 20 year of experience in programming, I have never been a low-level developer.  This tutorial is really "on eye leading the blind", so if you spot any mistakes, please feel free to comment or reach out to me in any other way.
+
+This tutorial assumes you have some experience with computer programming and you are familiar with at least the basics a computer's inner workings.  The main focus is the ARM assembly language as used on a Windows machine.  For example, I'll explain how to use the stack since that is something you need to do yourself, but I'll completely ignore memory management because that is handled by the Windows OS.
 
 I'm planning to make a YouTube series on this, but until then you will have to do with these projects.
 

@@ -8,9 +8,9 @@ _start:                 //the start of the sum-method
 
 
     //sum 2 constants
-    mov x10, #19
-    mov x11, #23
-    add x9, x10, x11
+    mov x10, #19        //put 19 in register 10
+    mov x11, #23        //put 23 in register 11
+    add x9, x10, x11    //put the sum of 19 and 23 in register 9
 
     mov w0, wzr         //set the function return value with the zero register
 
