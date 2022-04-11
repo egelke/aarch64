@@ -2,7 +2,7 @@
 
 Now that we have our environment setup, it is time to start with our first real world program.  As is tradition, that is off course "Hello Wold!".
 
-The [code](main.asm) functionally equivalent of the following C program:
+The [code](main.asm) is functionally equivalent of the following C program:
 
 ```C
 #include<Windows.h>
@@ -28,7 +28,7 @@ ARM has 32 registers that are 64 bits long, of these 32, 30 are "[general-purpos
 
 In summary, this is what you need to remember:
 
-* _X0-X7, X29/FP, X30/LR, SP_ have special meaning for [Fuctions](#functions), the tutorials will only use them in that context
+* _X0-X7, X29/FP, X30/LR, SP_ have special meaning for [Functions](#functions), the tutorials will only use them in that context
 * _X9-X15_ are you temporally (scratch) registers, they might be altered upon returning from a function call
 * _X19-X28_ are callee-saved registers, their values will be restored upon returning from a function call
 * _XZR_ is an abstract register that is always 0 and acts as a "null" device
@@ -61,7 +61,7 @@ Decrease the stack size with 16 bytes:
 
 Note that in both cases we index by 16 bytes since the ARM processor expects the SP register to by 16 bytes aligned and may fail when it isn't. Also, don't forget that the stack grows down, so the above examples are correct (sub increases and add decreases).
 
-That brings us with the **immediate** parameters.  In the above example `#` denotes an immediate; meaning its value is part of the instruction.  In aarch64, instructions are 32bit and contain the op-code and the references to the used registers.  In general there is some bits to spare, so some instructions reserve some bits to put the actual value instead of the register containing the value.  This save cpu-cycles and memory.  Obviously there are some size limits here (we have less the 32 bit), so the range of values you can use are always limited.  This limitation is often countered by the fact that immediates may of a value and a bit-shift or a pattern of bits, allowing larger numbers but with certain constrains.
+That brings us with the **immediate** parameters.  In the above example `#` denotes an immediate; meaning its value is part of the instruction.  In aarch64, instructions are 32bit and contain the op-code and the references to the used registers.  In general there are some bits to spare, so some instructions reserve some bits to put the actual value in, instead of referring the register containing the value.  This saves cpu-cycles and memory.  Obviously there are some size limits here (we have less then 32 bit), so the range of values you can use is always limited.  This limitation is often somewhat countered by the fact that immediates may by bit-shifted or a pattern of bits.  This allowing larger numbers but not any possible values, but what is possible tends to be the values often required in low level programming.
 
 It is also possible to define _aliases_ for immediate values, e.g.:
 
@@ -72,9 +72,9 @@ It is also possible to define _aliases_ for immediate values, e.g.:
     mov x0, NULL
 ```
 
-Allows us to use `NULL` instead of the value `0`.
+In the above example `NULL` is the alias for value `0`.
 
-Finally we come the maybe the most important part, accessing __heap memory__.  Before we can refer to heap, we need to tell the OS we reserved it so it can map the virtual memory of the application to the physical memory of the machine.  The easiest way to do so is by adding a `.data` segment to our source code. A `.data` segment will be part of the executable-file and loading into heap by the OS when it start your application.  While the data in memory itself is type agnostic (it are all bytes), the source files will specify the type of data.  This is needed for the compiler to interpret the literal value in your source file.  For example, this is how you define a zero-terminated string:
+Finally we come the maybe the most important part, accessing __heap memory__.  Before we can refer to heap, we need to tell the OS we need it so it can map the virtual memory of the application to the physical memory of the machine.  The easiest way to do so is by adding a `.data` segment to our source code. A `.data` segment will be part of the executable-file and loading into heap by the OS when it start your application.  While the data in memory itself is type agnostic (it's all one big array of bytes), in the source files will need to specify the type.  This is needed for the compiler to interpret the literal value in your source file.  For example, this is how you define a zero-terminated string:
 
 ```asm
     .asciz "My String\n" 
@@ -99,16 +99,16 @@ Getting the address of a label into a register can be done with one of the follo
 
 The `adr x1, text` instruction uses an compiler calculated immediate that is offset against the program counter (the address of memory that is currently being executed).  The advantage is that it uses only 1 instruction, but is limited to labels about 1 MB before or after the current PC value.  This might be an issue for large programs that have big code segments and/or big data segment.
 
-The `adrp x1, text` variant mitigates the 1 MB limit by left shifting the immediate value 12 bits so that it can reach 4 GB before or after the PC, but as the cost of loosing accuracy since now it can only access labels at the 4K boundary. Be **very careful** with this instruction, because the compiler doesn't care if the label you provide isn't at a 4K boundary, it will simply **round off** and put the address of the nearest 4k boundary in the register.  If you aren't careful, you will read the memory adjacent to label but not the memory at the label itself.
+The `adrp x1, text` variant mitigates the 1 MB limit by left shifting the immediate value 12 bits so that it can reach 4 GB before or after the PC, but as the cost of loosing accuracy since now it can only access labels at the 4K boundary. Be **very careful** with this instruction, because the compiler doesn't care if the label you provide isn't at a 4K boundary or not, it will simply **round off** and put the address of the 4k boundary in the register.  If you aren't careful, you will read wrong portion of memory.
 
-The `ldr x1, =text` can load any address in the 64bit address space, but at the cost of additional instructions since the compiler use a literal pool to store the label's address and load it from there.  In effect, it will convert it in the _equivalent_ of:
+The `ldr x1, =text` can load any address in the 64-bit address space, but at the cost of additional instructions since the compiler use a literal pool to store the label's address and load it from there.  In effect, it will execute the _equivalent_ of:
 
 ```asm
     adr x0, litpool_textaddr
     ldr x0, [x0]
 ```
 
-Which is not only more instructions, but also involves reading from memory which is in general slower.  The offset of the literal pool has the same 1 MB offset limitation, but can be easily mitigated by splitting the code in smaller segments since each code segment can be followed by a literal pool which tend to be small since they only contain addresses, no actual data.
+Which is not only more instructions, it also involves reading from memory which is in general slower.  The offset of the literal pool has the same 1 MB offset limitation, but can be easily mitigated by splitting the code in smaller segments since each code segment can be followed by a literal pool, which tend to be small since they only contain addresses, no actual data.
 
 ### Move registers
 
@@ -139,11 +139,11 @@ Once we have a register with the memory address (SP for the stack or any GP regi
     str x1, x2, [x0]
 ```
 
-The `ldr x1, [x0]` will load the (little-endian) value of memory with the address stored in x0 into register x1, the value of x0 or x1 are not altered.  The `ldp` does the same, but for 2 registers at the same time.  The `str` and `stp` do the opposite, they store the value from x1 into the memory with the address stored in x0.
+The `ldr x1, [x0]` will load the (little-endian) value of memory with the address stored in x0 into register x1, the value of x0 or x1 are not altered.  The `ldp` does the same, but for 2 registers at the same time.  The `str` and `stp` do the opposite, they store the value from x1 (and x2) into the memory starting with the address stored in x0.
 
-Note that loading data directly via its label with the (often referred) `ldr x0, label` instruction isn't supported on Windows.  It has something to do with the executable file format or something, but I'm not sure and I don't care.  It isn't working, so we can't use it and that is all I need to know.
+Note that loading data directly via its label with the (often cited) `ldr x0, label` instruction isn't supported on Windows.  It has something to do with the executable file format or something, but I'm not sure and I don't care.  It isn't working, so we can't use it and that is all I need to know.
 
-Since we often need to index a pointer (i.e. updates is value when using), aarch64 has several addressing modes that involve indexing:
+Since we often need to index a pointer (i.e. updates it's value when using), aarch64 has several addressing modes:
 
 * __simple__, `ldr x1, [x0]`: uses the value of x0 as address (as explained above)
 * __offset__, `ldr x1, [x0, #4]`: uses the value x0 + 4 as address, x0 keeps its original value.
@@ -152,7 +152,7 @@ Since we often need to index a pointer (i.e. updates is value when using), aarch
 
 Have a look at the official guide here [here](https://developer.arm.com/documentation/102374/0101/Loads-and-stores---addressing).
 
-While aarch64 has (in contradiction to 32bit ARM) no push/pop instructions to manipulate the stack, you simply use the equivalent vanilla instructions instead:
+While aarch64 has (in contradiction to 32bit ARM) no push/pop instructions to manipulate the stack, you must simply use the equivalent vanilla instructions instead:
 
 ```asm
     stp x0, x1, [sp, #-0x10]!       //push x0 & x1 to the stack
@@ -163,9 +163,9 @@ While aarch64 has (in contradiction to 32bit ARM) no push/pop instructions to ma
 
 On Windows an application is a function that is called by the OS.  The application's entry function doesn't have any parameters and as long as you don't call any functions yourself (i.e. your entry function is a _leaf-function_) you simply call `ret` at the end to return to the OS.  Setting the `w0` registers set the return code of the program, setting it "0" (with the aide of the `wzr` register) tells the outside world that your program finished successfully.
 
-Calling functions requires some extra work.  Calling a function is done with the `bl label` instruction which is a mnemonic for "branch link".  It will not only jump to that code, it will also **update** the `lr` register with the return address of the function (the code right after the `bl label` instruction).  The `ret` instruction will then "branch" to the `lr` register.  Funny enough, the `bl` (and variant `blr`) always update the `lr` register, but the `ret` instruction allows you return to addresses in different registers then `lr`.
+Calling functions requires some extra work.  Calling a function is done with the `bl label` instruction which is a mnemonic for "branch link".  It will not only jump to that code, it will also **update** the `lr` register with the return address of the function (the code right after the `bl label` instruction).  The `ret` instruction will then "branch" back to the `lr` register.
 
-Since all methods use the same `lr` register and there is nothing in the hardware or the OS that keeps track of it, it is up to you safe-keep its value before you use the `bl` instruction.  If you don't, well then you probably will end up in an endless loop since you return to the wrong address. The convention is that you put it on the stack when you enter your function and restore is from stack before you leave your function, as follows:
+Since all methods use the same `lr` register and there is nothing in the hardware or the OS that keeps track of it, it is up to you to safe-keep its value before you use the `bl` instruction.  If you don't, then you probably end up in an endless loop since you will return to the wrong address. The convention is that you put it on the stack when you enter your function and restore is from stack before you leave your function:
 
 ```asm
 entry:
@@ -175,11 +175,11 @@ entry:
     ret
 ```
 
-Using the stack allow you to simply nest calls without any worries, well at least until you run out of stack space.
+Using the stack, and not the heap, allow you to nest calls without any worries (at least until you run out of stack space).
 
-That just leaves us with the question on how to provide the parameters to the function call... After all, the `bl` instruction only has 1 parameters, that is the label is branches too.  The [full convention](https://docs.microsoft.com/en-us/cpp/build/arm64-windows-abi-conventions?view=msvc-170#parameter-passing) is quite complicated, but for now you simply need to know that registers `x0` to `x7` are your parameters.  A function with 1 parameter uses `x0` only, one with 2 parameters uses `x0` and `x1`...
+That just leaves us with the question on how to provide the parameters to the function call... The `bl`-instruction only has 1 fixed parameters: the label.  How do you provide the other parameters?  This [calling conventions](https://docs.microsoft.com/en-us/cpp/build/arm64-windows-abi-conventions?view=msvc-170#parameter-passing) is agreed up, and can be quite complicated. For now you simply need to know that registers `x0` to `x7` are your parameters.  A function with 1 parameter uses `x0` only, one with 2 parameters uses `x0` and `x1`, ...
 
-If you look at the  [`WriteFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile) documentation you see that it has 5 parameters, so we need to set `x0` to `x4` as so:
+If for example, if you look at the  [`WriteFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile) documentation you see that it has 5 parameters, so we need to set `x0` to `x4` as so:
 
 ```asm
     mov x0, x9
@@ -190,11 +190,11 @@ If you look at the  [`WriteFile`](https://docs.microsoft.com/en-us/windows/win32
     bl WriteFile
 ```
 
-Once in a function, which registers may you use?  You definitely may use the `x0`-`x7` registers in any why you like, but since they are used for function parameters I tend to only use them for that purpose (even the "spare" registers).  That make the code a little more readable, and we can use all the readability we can get when it comes to assembly.
+Once in a function, which registers may you use?  You may use the `x0`-`x7` registers in any why you like, but since they are used for function parameters I tend to only use them for that purpose (even the "spare").  That make the code a little more readable, and we can use all the readability we can get when it comes to assembly.
 
 Registers `x9`-`x15` are unsaved scratch registers, free to use without any constraints but they may be altered when returning from a function.  You can't not assume that any of the registers in this range will remain the same after you return from a function (i.e. after a `bl` instruction).
 
-Registers `x19`-`x28` are persistent, but require specific actions before usage.  This is not covered in this lesson, for that you need to wait until the next lesson where I explain this together with chained functions.
+Registers `x19`-`x28` are persistent, but you are supposed to safeguard the current value before using them.  This is not covered in this lesson, for that you need to wait until the next lesson where I explain this together with chained functions.
 
 ## Conclusion
 
