@@ -10,9 +10,9 @@ The [code](main.asm) is functionally equivalent of the following C program:
 char* msg = "Hello World!\n";
 
 int main() {
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	WriteFile(hOut, msg, 13, NULL, NULL);
-	return 0;
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    WriteFile(hOut, msg, 13, NULL, NULL);
+    return 0;
 }
 ```
 
