@@ -5,23 +5,27 @@
     //https://github.com/llvm/llvm-project/issues/54879
 
     .bss
+    .p2align 3
 stdOut:
     .space 8
     
     .data
+    .p2align 3
 pattern:
     .asciz "Meaning Of Life: %c\n"
 
     .text
     .p2align 2
 
+//some global definitions
 .equ STD_OUTPUT_HANDLE, -11
 
+    //entry fucntion "_start"
+    .global _start                  //Exporting the "_start" label
 a .req x10
 b .req x11
 c .req x9
-
-    .global _start                  //Exporting the "_start" label
+    
 _start:                             //the label of the "_start" function
     .seh_proc _start                //beginning of the function "_start"
     stp fp, lr, [sp, #-0x10]!       //push the framepointer & link register to the stack
@@ -59,10 +63,10 @@ _start:                             //the label of the "_start" function
     .seh_endproc                    //end of the function
 
 
-
+    //function printf
     .global printf
 p0_pattern .req x19                 //define alias for x19, use it for the pattern parameter
-p1_value .req x20                   //define alias for x19, use it for the value parameter 
+p1_value .req x20                   //define alias for x20, use it for the value parameter 
 count .req x21                      //define alias for x21, use it to keep the count
 
 .equ writen, 0x90                   //define the fp-offset of the writen local variable
@@ -84,24 +88,24 @@ printf:
     .seh_endprologue                //beginning of the body of the function
 
     //save the paramters
-    mov p0_pattern, x0
-    mov p1_value, x1
+    mov p0_pattern, x0              //save the first param in saved reg x19
+    mov p1_value, x1                //save the second param in saved reg x20
 
-    //call printfA
-    add x0, fp, buffer
-    mov x1, p0_pattern
-    mov x2, p1_value
+    //call wsprintfA
+    add x0, fp, buffer              //unnamedParam1: caluclate the buffer address as frame pointer offset
+    mov x1, p0_pattern              //unnamedParam2: the pattern to use (saved param)
+    mov x2, p1_value                //dynamic param0: the value to print (saved param)
     bl wsprintfA                    //call https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-wsprintfa
-    mov count, x0
+    mov count, x0                   //save the return value
 
     //write the buffer to stdOut
-    adr x0, stdOut
-    ldr x0, [x0]
-    add x1, fp, buffer
-    mov x2, count
-    add x3, fp, writen
-    mov x4, xzr
-    bl WriteFile
+    adr x0, stdOut                  //obtain the address of the stdOut global variable
+    ldr x0, [x0]                    //hFile: load the value of the stdOut global variable
+    add x1, fp, buffer              //lpBuffer: calculate the address of the buffer variable (offset to the fp)
+    mov x2, count                   //nNumberOfBytesToWrite: the bytes to write, obtained from the wsprintfA result 
+    add x3, fp, writen              //lpNumberOfBytesWritten: calcuate the address of the writen variable (offset to the fp)
+    mov x4, xzr                     //lpOverlapped: NULL
+    bl WriteFile                    //call ttps://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
 
     //return success
     ldr x0, [fp, writen]            //load the date from the written variable into x0 to be returned

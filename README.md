@@ -15,9 +15,10 @@ Projects so far:
 
 0. **[Sum](00.%20Sum/)**: Setup of the environment, including debugging and a leaf functions
 1. **[HelloWorld](01.%20HelloWorld/)**: constants, initialized global data, temp registers and unchained functions
-2. **MeaningOfLife**: register aliases, uninitialized global data, saved registers and chained functions (WIP)
-3. **ArgEcho**: local allocated data and loops (WIP)
-4. ...
+2. **[MeaningOfLife](02.%20MeaningOfLife/)**: register aliases, uninitialized global data, saved registers, local stack data and chained functions (WIP)
+3. **ArgEcho**: heap data, static libraries and branches (in preparation)
+4. **HowLong?**: system registers, ... (planned)
+5. ...
 
 ## Prerequisites
 
@@ -37,8 +38,9 @@ This series is made as a tutorial, meaning you learn by example.  It isn't a man
 The following references are provided by ARM inc itself:
 
 * Programmers guide: https://developer.arm.com/documentation/102374/latest/
-* ARMASM* reference guide: https://developer.arm.com/documentation/dui0802/b/A64-General-Instructions/A64-general-instructions-in-alphabetical-order
-* Instruction reference guide: https://developer.arm.com/documentation/ddi0602/latest
+* armclang reference guide: https://developer.arm.com/documentation/100067/0612/armclang-Integrated-Assembler?lang=en
+* Instruction summary of the ARMASM* reference guide: https://developer.arm.com/documentation/dui0802/b/A64-General-Instructions/A64-general-instructions-in-alphabetical-order
+* Instruction reference: https://developer.arm.com/documentation/ddi0602/latest
 
 *) While we use clang instead of asm, the armasm reference guide has nice a summary of instructions while the armclang reference guide doesn't.
 
