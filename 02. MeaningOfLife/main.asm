@@ -22,9 +22,10 @@ pattern:
 
     //entry fucntion "_start"
     .global _start                  //Exporting the "_start" label
-a .req x10
-b .req x11
-c .req x9
+    
+    a .req x10
+    b .req x11
+    c .req x9
     
 _start:                             //the label of the "_start" function
     .seh_proc _start                //beginning of the function "_start"
@@ -65,15 +66,16 @@ _start:                             //the label of the "_start" function
 
     //function printf
     .global printf
-p0_pattern .req x19                 //define alias for x19, use it for the pattern parameter
-p1_value .req x20                   //define alias for x20, use it for the value parameter 
-count .req x21                      //define alias for x21, use it to keep the count
+    
+    p0_pattern .req x19             //define alias for x19, use it for the pattern parameter
+    p1_value .req x20               //define alias for x20, use it for the value parameter 
+    count .req x21                  //define alias for x21, use it to keep the count
 
-.equ writen, 0x90                   //define the fp-offset of the writen local variable
-.equ buffer, 0x10                   //define the fp-offset of the buffer local variable
+    .equ writen, 0x90               //define the fp-offset of the writen local variable
+    .equ buffer, 0x10               //define the fp-offset of the buffer local variable
 
-.equ printf_savsz, 0x20             //Store 3 RegI, round up to nearest 0x10
-.equ printf_locsz, 0xA0             //Store fp/lr (0x10), 0x80 for buffer + 0x08 for 1 variable ==> 0xA0 rounder to nearest 0x10
+    .equ printf_savsz, 0x20         //Store 3 RegI, round up to nearest 0x10
+    .equ printf_locsz, 0xA0         //Store fp/lr (0x10), 0x80 for buffer + 0x08 for 1 variable ==> 0xA0 rounder to nearest 0x10
 
 printf:
     .seh_proc printf
@@ -105,7 +107,7 @@ printf:
     mov x2, count                   //nNumberOfBytesToWrite: the bytes to write, obtained from the wsprintfA result 
     add x3, fp, writen              //lpNumberOfBytesWritten: calcuate the address of the writen variable (offset to the fp)
     mov x4, xzr                     //lpOverlapped: NULL
-    bl WriteFile                    //call ttps://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+    bl WriteFile                    //call https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
 
     //return success
     ldr x0, [fp, writen]            //load the date from the written variable into x0 to be returned
