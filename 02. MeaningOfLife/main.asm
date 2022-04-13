@@ -30,20 +30,23 @@ _start:                             //the label of the "_start" function
     .seh_set_fp                     //tell the compiiler you set the frame pointer
     .seh_endprologue                //beginning of the function body
 
-    mov x0, STD_OUTPUT_HANDLE
-    bl GetStdHandle
-    adr x9, stdOut
-    str x0, [x9]
+    //get the stdOut in a global variable
+    mov x0, STD_OUTPUT_HANDLE       //nStdHandle: STD_OUTPUT_HANDLE = -11
+    bl GetStdHandle                 //call https://docs.microsoft.com/en-us/windows/console/getstdhandle
+    adr x9, stdOut                  //load the address of stdOut variable (.bss segment)
+    str x0, [x9]                    //store the stdOut value in the addess
 
-    mov a, #19
-    mov b, #23
-    add c, a, b
+    //sum 19 & 23
+    mov a, #19                      //put 19 in the "a" alias (x10)
+    mov b, #23                      //put 23 in the "b" alias (x11)
+    add c, a, b                     //put the sum in the "alias" (x9)
 
-    mov x0, c
-    bl printc
+    //print it to console
+    adr x0, pattern                 //param1: the address of the pattern
+    mov x1, c                       //param2: the byte to use in the pattern
+    bl printf                       //call our own printf method
 
-    //return success
-    mov w0, wzr
+                                    //return the value of the previous call, so no need to set w0
 
     //epilog
     .seh_startepilogue              //end of the function body, start of the unwind
@@ -56,34 +59,42 @@ _start:                             //the label of the "_start" function
     .seh_endproc                    //end of the function
 
 
-value .req x19
-count .req x20
-result .req x21
 
-.equ writen, 0x90
-.equ buffer, 0x10
+    .global printf
+p0_pattern .req x19                 //define alias for x19, use it for the pattern parameter
+p1_value .req x20                   //define alias for x19, use it for the value parameter 
+count .req x21                      //define alias for x21, use it to keep the count
 
-    .global printc
-printc:
-    .seh_proc printc
-    stp x19, x20,[sp,#-0x20]!
-    .seh_save_regp_x x19, 0x20
-    str x21, [sp, #0x10]
+.equ writen, 0x90                   //define the fp-offset of the writen local variable
+.equ buffer, 0x10                   //define the fp-offset of the buffer local variable
+
+.equ printf_savsz, 0x20             //Store 3 RegI, round up to nearest 0x10
+.equ printf_locsz, 0xA0             //Store fp/lr (0x10), 0x80 for buffer + 0x08 for 1 variable ==> 0xA0 rounder to nearest 0x10
+
+printf:
+    .seh_proc printf
+    stp x19, x20,[sp,#-printf_savsz]!//push x19 & x20 on the stack & reserve savsz space for all Reg that will be stored
+    .seh_save_regp_x x19, printf_savsz  
+    str x21, [sp, #0x10]            //put x12 on the stack
     .seh_save_reg x21, 0x10
-    stp fp, lr, [sp, #-0xA0]!       //allocate 0x10 for the fp/lr + 0x80 for the buffer + 0x08 for the "writen" -> 0x98 (= 0xA0 rounded)
-    .seh_save_fplr_x 0xA0
-    mov fp, sp
+    stp fp, lr, [sp, #-printf_locsz]!//push fp/lr on the stack & allocate space for the local variables
+    .seh_save_fplr_x printf_locsz
+    mov fp, sp                      //set the fp
     .seh_set_fp
-    .seh_endprologue
+    .seh_endprologue                //beginning of the body of the function
 
-    mov value, x0
+    //save the paramters
+    mov p0_pattern, x0
+    mov p1_value, x1
 
+    //call printfA
     add x0, fp, buffer
-    adr x1, pattern
-    mov x2, value
-    bl wsprintfA
+    mov x1, p0_pattern
+    mov x2, p1_value
+    bl wsprintfA                    //call https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-wsprintfa
     mov count, x0
 
+    //write the buffer to stdOut
     adr x0, stdOut
     ldr x0, [x0]
     add x1, fp, buffer
@@ -93,17 +104,17 @@ printc:
     bl WriteFile
 
     //return success
-    mov w0, wzr
+    ldr x0, [fp, writen]            //load the date from the written variable into x0 to be returned
 
-    .seh_startepilogue
-    ldp fp, lr, [sp], #0xA0
-    .seh_save_fplr_x 0xA0
-    ldr x21, [sp, #0x10]
+    .seh_startepilogue              //end of the body of the function
+    ldp fp, lr, [sp], #printf_locsz //pop the fp/lr from the stack & "free" local variable storage
+    .seh_save_fplr_x printf_locsz
+    ldr x21, [sp, #0x10]            //read x21 from the stack
     .seh_save_reg x21, 0x10
-    ldp x19, x20, [sp], #0x20
-    .seh_save_regp_x x19, 0x20
-    .seh_endepilogue
+    ldp x19, x20, [sp], #printf_savsz//pop x19 & x20 from the stack & free Reg storage
+    .seh_save_regp_x x19, printf_savsz
+    .seh_endepilogue                //end of the prologue
 
-    ret
-    .seh_endfunclet
-    .seh_endproc
+    ret                             //return from the function
+    .seh_endfunclet                 
+    .seh_endproc                    //end of the function
