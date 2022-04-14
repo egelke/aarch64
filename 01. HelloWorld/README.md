@@ -97,18 +97,32 @@ Getting the address of a label into a register can be done with one of the follo
     ldr x1, =text       //get the address for label "text" via a literal pool.
 ```
 
-The `adr x1, text` instruction uses an compiler calculated immediate that is offset against the program counter (the address of memory that is currently being executed).  The advantage is that it uses only 1 instruction, but is limited to labels about 1 MB before or after the current PC value.  This might be an issue for large programs that have big code segments and/or big data segment.
 
-The `adrp x1, text` variant mitigates the 1 MB limit by left shifting the immediate value 12 bits so that it can reach 4 GB before or after the PC, but as the cost of loosing accuracy since now it can only access labels at the 4K boundary. Be **very careful** with this instruction, because the compiler doesn't care if the label you provide isn't at a 4K boundary or not, it will simply **round off** and put the address of the 4k boundary in the register.  If you aren't careful, you will read wrong portion of memory.
+The `adr x1, text` instruction uses an compiler calculated immediate that is offset against the program counter (the address of memory that is currently being executed).  The advantage is that it uses only 1 instruction, but is limited to labels about 1 MB before or after the current PC value.  
 
-The `ldr x1, =text` can load any address in the 64-bit address space, but at the cost of additional instructions since the compiler use a literal pool to store the label's address and load it from there.  In effect, it will execute the _equivalent_ of:
+The `adrp x1, text` variant mitigates the 1 MB limit by left shifting the immediate value 12 bits so that it can reach 4 GB before or after the PC, but as the cost of loosing accuracy since now it can only access labels at the 4K boundary. 
+
+The `ldr x1, =text` can load any address in the 64-bit address space, but at the cost of additional executing time since the compiler use a literal pool to store the label's address and load it from there.  In effect, it will execute the _equivalent_ of:
 
 ```asm
     adr x0, litpool_textaddr
     ldr x0, [x0]
 ```
 
-Which is not only more instructions, it also involves reading from memory which is in general slower.  The offset of the literal pool has the same 1 MB offset limitation, but can be easily mitigated by splitting the code in smaller segments since each code segment can be followed by a literal pool, which tend to be small since they only contain addresses, no actual data.
+While `adr` and `adrp` are great for optimization, they are **very dangerous** to use with hand-written assembly since you get no feedback at all if you are given the intended address or a different value.  Clang does _not_ give any warning if you overflow nor if the address is rounded.  For C/C++ compilers this isn't an issue, they can do all the necessary calculations necessary to use `adr` directly or `adrp` with an offset.  When you write assembly by hand that isn't very realistic though.  So, while the `ldr` variant might be a little overhead, it is by far the safes solution.  I therefore propose to use `ldr` by default unless you are sure about the offsets.
+
+The following instruction is also often sited in documents:
+
+```asm
+    ldr x0, label
+```
+
+Unfortunately when you try this on Windows you will get an "unsupported on COFF targets" error.  Not sure why, but it isn't working so we can't use it here.  Pity, because it would be very useful.  Instead we need to resolve to the following alternative:
+
+```asm
+    ldr x0, =label
+    ldr x0, [x0]
+```
 
 ### Move registers
 
@@ -140,8 +154,6 @@ Once we have a register with the memory address (SP for the stack or any GP regi
 ```
 
 The `ldr x1, [x0]` will load the (little-endian) value of memory with the address stored in x0 into register x1, the value of x0 or x1 are not altered.  The `ldp` does the same, but for 2 registers at the same time.  The `str` and `stp` do the opposite, they store the value from x1 (and x2) into the memory starting with the address stored in x0.
-
-Note that loading data directly via its label with the (often cited) `ldr x0, label` instruction isn't supported on Windows.  It has something to do with the executable file format or something, but I'm not sure and I don't care.  It isn't working, so we can't use it and that is all I need to know.
 
 Since we often need to index a pointer (i.e. updates it's value when using), aarch64 has several addressing modes:
 
@@ -190,9 +202,9 @@ If for example, if you look at the  [`WriteFile`](https://docs.microsoft.com/en-
     bl WriteFile
 ```
 
-Once in a function, which registers may you use?  You may use the `x0`-`x7` registers in any why you like, but since they are used for function parameters I tend to only use them for that purpose (even the "spare").  That make the code a little more readable, and we can use all the readability we can get when it comes to assembly.
+Once in a function, which registers may you use?  You may use the `x0`-`x7` registers in any why you like, but since they are used for function parameters I tend to only use them solely for that purpose (even the "spare").  That make the code a little more readable, and we can use all the readability we can get when it comes to assembly.
 
-Registers `x9`-`x15` are unsaved scratch registers, free to use without any constraints but they may be altered when returning from a function.  You can't not assume that any of the registers in this range will remain the same after you return from a function (i.e. after a `bl` instruction).
+Registers `x9`-`x15` are unsaved scratch registers, free to use without any constraints but they may be altered when returning from a function.  You can _not_ assume that any of the registers in this range will remain the same after you return from a function (i.e. after a `bl` instruction).
 
 Registers `x19`-`x28` are persistent, but you are supposed to safeguard the current value before using them.  This is not covered in this lesson, for that you need to wait until the next lesson where I explain this together with chained functions.
 

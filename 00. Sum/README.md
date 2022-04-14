@@ -110,7 +110,7 @@ In summary it is telling you the kernel loaded your program (`sum.exe`) and hit 
 First we will tell it to stop at the entry point of your program, which is the `start` (the underscore got dropped by the toolchain) in the `sum` module.  You do this by typing the following command in at the bottom of the command window:
 
 ```
-0:000> bm sum!start
+0:000> bm start
   1: 00007ff7`2b351000 @!"Sum!start"
 ```
 

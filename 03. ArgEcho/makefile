@@ -4,7 +4,7 @@ DEPLOY_TARGET = \\$(REMOTE_AARCH64_COMPUTER)\Data
 
 TARGET = aarch64-pc-windows-msvc
 MACHINE = ARM64
-ASM_DEBUG = -g
+ASM_DEBUG = 
 ASM_FLAGS = 
 
 LINK_LIB = "kernel32.lib" "User32.lib" "Shell32.lib"

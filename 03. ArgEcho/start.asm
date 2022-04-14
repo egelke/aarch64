@@ -2,23 +2,24 @@
 
     .include "cfunc.inc.asm"
 
-    .equ MAX_ARGC, 10
-    .equ ARGV_AVG_LEN, 0x80
+    .equ MAX_ARGC, 100
+    .equ ARGV_AVG_LEN, 0x80000
 
     .bss
     .p2align 3
-gArgc:
-    .quad
-gArgvA:
-    .space 0x08 * MAX_ARGC
 gArgvA_Data:
     .space ARGV_AVG_LEN * MAX_ARGC
-gArgvA_Data_End:
+gArgvA:
+    .space 0x08 * MAX_ARGC
+gArgc:
+    .space 0x08
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
     .data
     .p2align 3
 gArgvA_DataLen:
-    .quad gArgvA_Data_End - gArgvA_Data
+    .quad gArgvA - gArgvA_Data
+
 
     .text
     .p2align 2
@@ -39,18 +40,19 @@ _start:
 
     //convert the command line into args
     bl GetCommandLineW                  //lpCmdLine: call https://docs.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-getcommandlinew
-    adr x1, gArgc                       //pNumArgs: pointer to global argc
+    ldr x1, =gArgc                      //pNumArgs: pointer to global argc
     bl CommandLineToArgvW               //https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw 
     cbz x0, _start_err                  //Return value: check if an error occured
     mov rArgvW, x0                      //Return value: save to the local argv (stack local area)
-    adr x9, gArgc                       //read argc from memory
+    ldr x9, gArgc
+    ldr x9, =gArgc                      //read argc from memory
     ldr rArgc, [x9]
 
     //init the variables to convert argvW into argvA
-    adr rArgvA, gArgvA                  //load the address of the argvA pointer array
-    adr rArgvANxt, gArgvA_Data          //load the start address of the argvA data block
+    ldr rArgvA, =gArgvA                 //load the address of the argvA pointer array
+    ldr rArgvANxt, =gArgvA_Data         //load the start address of the argvA data block
     mov rArgcIdx, #0                    //start at 0
-    adr x9, gArgvA_DataLen              //read the size of the data block from memory
+    ldr x9, =gArgvA_DataLen             //read the size of the data block from memory
     ldr rArgvARem, [x9]                 //read
 _start_next_argv:
     //try to convert the w-string into an a-string

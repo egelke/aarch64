@@ -16,7 +16,7 @@ Projects so far:
 0. **[Sum](00.%20Sum/)**: Setup of the environment, including debugging and a leaf functions
 1. **[HelloWorld](01.%20HelloWorld/)**: constants, initialized global data, temp registers and unchained functions
 2. **[MeaningOfLife](02.%20MeaningOfLife/)**: register aliases, uninitialized global data, saved registers, local stack data and chained functions (WIP)
-3. **ArgEcho**: multiple source files, includes, macros, expressions, heap data and branches (in preparation)
+3. **ArgEcho**: multiple source files, includes, macros, expressions, heap data and branches (WIP)
 4. **HowLong?**: system registers, ... (planned)
 5. ...
 
