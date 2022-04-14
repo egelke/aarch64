@@ -1,5 +1,5 @@
 APP_NAME = ArgEcho
-OBJECTS =  $(OBJ_DIR)main.obj $(OBJ_DIR)print.obj
+OBJECTS =  $(OBJ_DIR)main.obj $(OBJ_DIR)print.obj $(OBJ_DIR)start.obj
 DEPLOY_TARGET = \\$(REMOTE_AARCH64_COMPUTER)\Data
 
 TARGET = aarch64-pc-windows-msvc
