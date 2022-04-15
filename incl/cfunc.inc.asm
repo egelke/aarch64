@@ -76,6 +76,8 @@
         .if (0x10+\alloc) < 512
             stp fp, lr, [sp, #-(0x10+\alloc)]!
             .seh_save_fplr_x (0x10+\alloc)
+        .elseif (0x10+\alloc) == 512
+            .error "a #locsz of exaclty 512 not supported with packed unwind data (over-allocate or used unpacked)"
         .elseif (0x10+\alloc) <= 4080
             sub sp,sp,(0x10+\alloc)
             .seh_stackalloc (0x10+\alloc)
@@ -109,7 +111,6 @@
 
         .seh_startepilogue
 
-    
         //restore fp/lr data & free local mem
         .if (0x10+\alloc) < 512
             ldp fp, lr, [sp], (0x10+\alloc)
