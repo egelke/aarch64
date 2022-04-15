@@ -66,9 +66,9 @@ That brings us with the **immediate** parameters.  In the above example `#` deno
 It is also possible to define _aliases_ for immediate values, e.g.:
 
 ```asm
-.equ NULL, 0 
+    .equ NULL, 0 
 
-.text
+    .text
     mov x0, NULL
 ```
 

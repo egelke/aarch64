@@ -1,9 +1,5 @@
     .arch armv8-a
 
-    //https://reviews.llvm.org/rG5b86d130e2baed7221b09087c506f5974fe65f22
-    //link: https://reviews.llvm.org/source/llvm-github/browse/main/llvm/test/CodeGen/AArch64/wineh6.mir
-    //https://github.com/llvm/llvm-project/issues/54879
-
     .bss
     .p2align 3
 stdOut:
@@ -17,12 +13,13 @@ pattern:
     .text
     .p2align 2
 
-//some global definitions
-.equ STD_OUTPUT_HANDLE, -11
+    //some global definitions
+    .equ STD_OUTPUT_HANDLE, -11
 
     //entry fucntion "_start"
     .global _start                  //Exporting the "_start" label
     
+    //define aliases for registries
     a .req x10
     b .req x11
     c .req x9
