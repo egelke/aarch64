@@ -21,7 +21,7 @@ arg_msg:
     argv    .req x20
 
 main:
-    cfunc_prolog main, RegI=2
+    cfunc_prolog main, RegI=2, H=1
 
     //store the params
     mov argc, x0
@@ -47,4 +47,4 @@ finished:
     //return value
     mov w0, #0
 
-    cfunc_epilog RegI=2
+    cfunc_epilog RegI=2, H=1

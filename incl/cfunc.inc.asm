@@ -60,7 +60,7 @@
             .error "H without RegI isn't supported (yet)"
         .endif
         .if \H <> 0
-            .error "not supported due to bug in clang (issue #54879)"
+            //.error "not supported due to bug in clang (issue #54879)"
             stp x0,x1,[sp,#(0x10 * \RegI * \RegF / 2 + 0x10)]
             .seh_nop
             stp x2,x3,[sp,#(0x10 * \RegI * \RegF / 2 + 0x20)]
@@ -130,7 +130,6 @@
 
         //restore the Home registes
         //temp fix for a bug in clang: #54879
-        /*
         .if \H <> 0
             stp x6,x7,[sp,#(0x10 * \RegI * \RegF / 2 + 0x40)]
             .seh_nop
@@ -141,8 +140,7 @@
             stp x0,x1,[sp,#(0x10 * \RegI * \RegF / 2 + 0x10)]
             .seh_nop
         .endif
-        */
-        
+
         //restore the save ReF
         .if \RegF > 2
             ldp d10, d11, [sp,#(0x10 * \RegI / 2 + 0x10)]
