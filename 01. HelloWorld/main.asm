@@ -1,7 +1,7 @@
     .arch armv8-a               //specify the target arm version
 
-.equ STD_OUTPUT_HANDLE, -11     //define a logical name for -11 (see https://docs.microsoft.com/en-us/windows/console/getstdhandle) 
-.equ NULL, 0                    //define a logical name for 0
+    .equ STD_OUTPUT_HANDLE, -11 //define a logical name for -11 (see https://docs.microsoft.com/en-us/windows/console/getstdhandle) 
+    .equ NULL, 0                //define a logical name for 0
 
     .data                       //start a data section with initalized data
 msg:                            //set a label that refers to the memory adress this place

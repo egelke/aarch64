@@ -44,6 +44,7 @@ _start:
     bl CommandLineToArgvW               //https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw 
     cbz x0, _start_err                  //Return value: check if an error occured
     mov rArgvW, x0                      //Return value: save to the local argv (stack local area)
+    ldr x9, gArgc
     ldr x9, =gArgc                      //read argc from memory
     ldr rArgc, [x9]
 
