@@ -121,3 +121,5 @@ printf:
     ret                             //return from the function
     .seh_endfunclet                 
     .seh_endproc                    //end of the function
+
+    .end
