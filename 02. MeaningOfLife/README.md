@@ -64,7 +64,7 @@ This represents the most common virtual memory layout as seen by the application
 
 The __text__, __data__ and __bss__ section are part of the executable and therefore defined by the source files so the compiler knows how to generate them (how to define those is described [here](#sections)).  When the OS start your application, it loads these sections accordingly.  The _text_ and _data_ section will be initialized with actual values, the former with your code and the later with predefined data.  The _bss_ section is not initialized and will either contain all `0`'s or "garbage". The _text_ section is ready only, writing to it should be blocked by the OS.  The _data_ and _bss_ are read/write.  Note that writes to the _data_ section only update the memory, not the executable, so the next time your start your application the memory will be back at the original values.  Also note that _text_ and _data_ segments are actually part of you executable file, so do not put large arrays in your _data_ segment since that will create large executable that take a long time to load; use _bss_, _heap_ or _stack_ instead.
 
-The __Heap__ and __stack__ are different, you need to be initialize and managed them via your code.  The stack is described [here](#stack), while for the heap you have to be a little patient and wait for the next lesson.  
+The __Heap__ and __stack__ are different, they are dynamic memory: you need to be initialize and managed them via your code.  The stack is described [here](#stack), while for the heap you have to be a little patient and wait for the next lesson.  Note that _bss_, _data_ and even _text_ segments can also be refereed to as _heap_ (one way of allocating dynamic heap is by extend the _bss_ section via code).  Sorry if it gets confusing at times, I'll do my best to use _heap_ solely for the dynamic allocated memory only.
 
 CPUs work best when they can access memory aligned on their natural boundaries (some even even require it).  Since aarch64 instructions are 32 bit in length and operate on 64 bit data, it is advised to align the _text_ section on 32 bit boundaries and _data_ and _bss_ sections on 64 bit boundaries.
 
@@ -91,8 +91,24 @@ array:
 
 The final section is `.bss`, where you define (labeled) blocks of memory that doe not have pre-defined values, i.e. you have a series of `.space` directive.
 
-Aligning the section on the proper boundary can be done with the `.p2align` directive described [here](https://developer.arm.com/documentation/100067/0612/armclang-Integrated-Assembler/Alignment-directives) and described a power of 2 alignment.  The `.text` segment should be `.p2align 2` or 2² = 4 while `.data` and `.bss` should be `p2align 3` or 2³ = 8. 
+Aligning the section on the proper boundary can be done with the `.p2align` directive described [here](https://developer.arm.com/documentation/100067/0612/armclang-Integrated-Assembler/Alignment-directives) and described a power of 2 alignment.  The `.text` segment should be `.p2align 2` or 2² = 4 while `.data` and `.bss` should be `p2align 3` or 2³ = 8.
 
 ### Stack Memory
+
+As explained in the [above](#memory) section, the _Stack_ is dynamic memory that you need to managed for the most part.  It resist on the top part of the applications memory space, so increasing it means reducing the pointer to it.  In the previous lesson we already learned that it is controlled by the `sp` register which must be __16 bytes aligned__.  You also learned how to push and pop something on the stack, or increase/decrease its size:  
+
+```asm
+    stp x0, x1, [sp, #-0x10]!       //push x0 & x1 to the stack
+    sub sp, #400                    //increase the stack with 1K
+    ...
+    add sp, #400                    //decrease the stack with 1K 
+    ldp x0, x1, [sp], #0x10         //pop x0 & x1 from the stack
+```
+
+That is basically all you need to know about the anatomy and manipulation of the stack, that doesn't however explain why there is a stack in the first place.  Why is it so important and what can it is used for?
+
+The first reason why Stack is so important is __convenience__.  Changing the size can be done with a single hardware instruction, you will see later on that this is't the case for _heap_ manipulations.  Sure there is the _bss_ segment, but that can't grow as easily as a stack can.  Historically stack size where very limited, but not so much any more, but there is still a (size) limit to stacks.
+
+Even more relevant then convenience is the fact that it's perfect to serve as __local storage__, compared to the _global_ storage of _data_, _bss_ and _heap_.  Local refers to the fact that it local to a function call: each function will have its own separate storage even when you call the same function recursively.  There is no magic here, each function is supposed to put its data on top of whatever is already on the stack.  At the beginning of a function it will simply adds its "stuff" onto the stack, that stuff is called a "__frame__".  More on function calls in the next section.
 
 ## Functions
