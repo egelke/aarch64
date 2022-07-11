@@ -17,7 +17,9 @@ Projects so far:
 2. **[MeaningOfLife](02.%20MeaningOfLife/)**: register aliases, uninitialized global data, saved registers, local stack data and chained functions
 3. **ArgEcho**: multiple source files, includes, macros, expressions, heap data and branches (WIP)
 4. **HowLong?**: system registers, ... (planned)
-5. ...
+5. **PrimeSieve**: integer instructions by finding prime numbers
+6. **AreWeOk?**: vector instructions by encoding/decoding QOI (Quite OK Image Format)
+7. **???**: threads and atomic instructions.
 
 ## Prerequisites
 

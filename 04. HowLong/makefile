@@ -8,7 +8,7 @@ MACHINE = ARM64
 ASM_DEBUG = 
 ASM_FLAGS = 
 
-LINK_LIB = "kernel32.lib" "User32.lib" "Shell32.lib" "egelke.lib" "Shlwapi.lib"
+LINK_LIB = "kernel32.lib" "User32.lib" "Shell32.lib" "egelke.lib" "Shlwapi.lib" "Bcrypt.lib"
 LINK_DEBUG = /DEBUG
 LINK_ENTRY = "_start"
 
